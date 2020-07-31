@@ -33,11 +33,13 @@
             <span class="dot active"></span>
             <span class="dot"></span>
           </div>
-          <!-- //TODO:进度条  -->
+          <!-- 进度条  -->
           <div class="progress-wrapper">
-            <span class="current-time">{{ currentTime }}</span>
-            <div class="progress-bar"></div>
-            <span class="time"></span>
+            <span class="current-time">{{ normalizeTime }}</span>
+            <div class="progress-bar">
+              <progress-bar :percent="percent" @changeProgress="changeProgress" />
+            </div>
+            <span class="time">{{ duration }}</span>
           </div>
           <!-- 控制面板 -->
           <div class="control-panel">
@@ -74,7 +76,10 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i @click.stop="togglePlaying" :class="miniPlayIcon"></i>
+          <!-- // TODO: 播放按钮 -->
+          <progress-circle :percent="percent" @togglePlaying="togglePlaying">
+            <i :class="miniPlayIcon"></i>
+          </progress-circle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -95,6 +100,9 @@ import { mapState, mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import Util from '../../common/util'
 
+import ProgressBar from '../../base/progress-bar/ProgressBar'
+import ProgressCircle from '../../base/progress-circle/ProgressCircle'
+
 const util = new Util()
 
 const transform = util.prefixStyle('transform')
@@ -103,7 +111,8 @@ export default {
   data() {
     return {
       songReady: false,
-      currentTime: 0
+      currentTime: 0,
+      normalizeTime: '00:00'
     }
   },
   computed: {
@@ -119,6 +128,12 @@ export default {
     disableCls() {
       return this.songReady ? '' : 'disable'
     },
+    duration() {
+      return util.normalizeTime(this.currentSong.duration)
+    },
+    percent() {
+      return this.currentTime / this.currentSong.duration
+    },
     ...mapState([
       'fullScreen',
       'playList',
@@ -128,6 +143,10 @@ export default {
     ...mapGetters([
       'currentSong'
     ])
+  },
+  components: {
+    ProgressBar,
+    ProgressCircle
   },
   methods: {
     togglePlaying() {
@@ -144,12 +163,14 @@ export default {
         return
       }
       let index = this.currentIndex
+      // 上一曲
       if (!isNext) {
         index += -1
         if (index === -1) {
           index = this.playList.length - 1
         }
       } else {
+      // 下一曲
         index += +1
         if (index === this.playList.length) {
           index = 0
@@ -163,7 +184,14 @@ export default {
       this.prevOrNext(true)
     },
     setCurrentTime(e) {
-      this.currentTime = util.normalizeTime(e.target.currentTime)
+      this.currentTime = e.target.currentTime
+      this.normalizeTime = util.normalizeTime(this.currentTime)
+    },
+    changeProgress(percent) {
+      this.$refs.audio.currentTime = this.currentSong.duration * percent
+      if (!this.playing) {
+        this.setPlaying(true)
+      }
     },
     // TODO: Plyer--methods
     enter(el, done) {
@@ -364,6 +392,18 @@ export default {
         padding 10px 0
         width 80%
         margin 0 auto
+        display flex
+        align-items center
+        .current-time, .time {
+          flex 0 0 30px
+          font-size $font-size-small
+        }
+        .time {
+          text-align right
+        }
+        .progress-bar {
+          flex 1
+        }
       }
       .control-panel {
         color $color-theme
@@ -446,11 +486,17 @@ export default {
       }
     }
     .control {
+      position relative
       width 50px
+      height 32px
       font-size 32px
       color $color-theme
       box-sizing border-box
       padding 0 10px
+      &:nth-child(3) i {
+        position absolute
+        top 0
+      }
       &:last-child {
         font-size 28px
       }
