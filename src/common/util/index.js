@@ -1,4 +1,3 @@
-// TODO:util.js
 /**
  * 工具类
  * @class
@@ -134,6 +133,50 @@ export default class Util {
     }
     return `${RES_MINUTE}:${resSecond}`
   }
+
+  /**
+   * 返回一个随机排列的数组
+   * @param {Array} array
+   */
+  randomSort(array) {
+    const [...ret] = array // 防止修改原数组
+    const LENGTH = ret.length
+    for (let i = 0; i < LENGTH; i++) {
+      const j = this.getRandom(0, i)
+      const item = ret[j]
+      ret[j] = ret[i]
+      ret[i] = item
+    }
+    return ret
+  }
+
+  /**
+   * 生成一个[min, max] 的随机数
+   * @param {Number} min 最小值
+   * @param {Number} max 最大值
+   */
+  getRandom(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+
+  /**
+   * 延时执行
+   * @param {Function} fun 需要延时执行的函数
+   * @param {Number} interval 间隔时间
+   */
+  throttle(func, interval) {
+    let timer
+    return function () {
+      if (timer) {
+        clearTimeout(timer)
+      }
+
+      timer = setTimeout(() => {
+        func.apply(this, arguments)
+      }, interval)
+    }
+  }
+  // TODO:util.js
 }
 
 const elementStyle = document.createElement('div').style

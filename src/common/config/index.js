@@ -3,3 +3,8 @@ export const playMode = {
   loop: 1,
   random: 2
 }
+
+export const storageKey = {
+  search: '__search__',
+  play: '__play__'
+}

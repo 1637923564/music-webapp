@@ -1,5 +1,5 @@
 import Request from '../common/util/request'
-import { commonParams, commonHeaders } from './config'
+import { commonParams, commonHeaders, jsonpCommonParams } from './config'
 
 const request = new Request()
 
@@ -49,4 +49,34 @@ export function getRecommendList() {
     .then(res => {
       return res
     })
+}
+// 歌单详情api
+export function getSongList(disstid) {
+  const URL = '/api/getCdInfo'
+  const params = Object.assign({}, jsonpCommonParams, {
+    disstid,
+    type: 1,
+    json: 1,
+    utf8: 1,
+    onlysong: 0,
+    platform: 'yqq',
+    hostUin: 0,
+    needNewCode: 0
+  })
+  const headers = {
+    referer: 'https://c.y.qq.com/',
+    host: 'c.y.qq.com'
+  }
+  request.accessProxy({
+    url: URL,
+    headers,
+    params
+  })
+  return request.accessProxy({
+    url: URL,
+    headers,
+    params
+  }).then(res => {
+    return res
+  })
 }

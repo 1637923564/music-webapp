@@ -34,7 +34,7 @@ export default {
       getSingerDetail(this.singer.id)
         .then(res => {
           if (res.code === ERR_OK) {
-            processUrl(this._normalizeSongs(res.data.list))
+            processUrl(this._normalizeSongs(res.data.list, res.data.singer_mid))
               .then(songs => {
                 this.songs = songs
               })
@@ -42,7 +42,7 @@ export default {
         })
     },
     // 将歌曲数据规范化
-    _normalizeSongs(list) {
+    _normalizeSongs(list, singerId) {
       const result = []
       list.forEach(item => {
         const { musicData } = item
@@ -65,5 +65,6 @@ export default {
   height 100%
   z-index 1000
   background $color-background
+  color #fff
 }
 </style>

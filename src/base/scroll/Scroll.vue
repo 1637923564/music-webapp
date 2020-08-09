@@ -6,6 +6,7 @@
 
 <script>
 import BScroll from 'better-scroll'
+
 export default {
   props: {
     probeType: {
@@ -17,12 +18,19 @@ export default {
       default: true
     },
     tag: {
-      type: Array,
       default: null
     },
     listenScroll: {
       type: Boolean,
       default: false
+    },
+    listenScrollEnd: {
+      type: Boolean,
+      default: false
+    },
+    scrollReady: {
+      type: Boolean,
+      default: true
     }
   },
   mounted() {
@@ -36,9 +44,18 @@ export default {
         click: this.click,
         scrollY: true
       })
+
       if (this.listenScroll) {
         this.scroll.on('scroll', coor => {
           this.$emit('scroll', coor)
+        })
+      }
+
+      if (this.listenScrollEnd) {
+        this.scroll.on('scrollEnd', () => {
+          if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+            this.$emit('onScrollToEnd')
+          }
         })
       }
     },
@@ -49,6 +66,9 @@ export default {
     // 滚动到某个位置
     scrollToElement(el, time) {
       this.scroll.scrollToElement(el, time)
+    },
+    scrollTo(x, y, time) {
+      this.scroll.scrollTo(x, y, time)
     }
   },
   watch: {

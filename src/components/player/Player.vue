@@ -16,35 +16,61 @@
             <span @click="back" class="icon-wrapper"><i class="icon-back"></i></span>
             <span class="text">{{ currentSong.name }}</span>
           </div>
-          <div class="singer">{{ currentSong.singer }}</div>
+          <div class="singer">
+            <span @click="jumpSingerDetial">{{ currentSong.singer }}</span>
+          </div>
         </div>
         <!-- body -->
-        <div class="player-body">
-          <div class="record-box">
+        <div class="player-body"
+             @touchstart="showLyricStart"
+             @touchmove="showLyricMove"
+             @touchend="showLyricEnd"
+        >
+          <!-- 唱片界面 -->
+          <div class="record-box" ref="recordBox">
             <div class="record-wrapper" ref="normalCD">
               <img :src="currentSong.image" class="record" :class="recordCls">
             </div>
+            <div class="record-lyric">{{ recordLyric }}</div>
           </div>
+          <!-- 歌词界面 -->
+          <scroll class="lyric-box" ref="lyricScroll" :tag="currentLyric">
+            <div class="lyric-wrapper">
+              <ul class="list" v-if="currentLyric">
+                <li class="lyric"
+                    ref="lyricLine"
+                    :class="{active: index === lyricIndex}"
+                    v-for="(item, index) in currentLyric.lines"
+                    :key="index"
+                >
+                  {{ item.txt }}
+                </li>
+              </ul>
+            </div>
+          </scroll>
         </div>
         <!-- 控制栏 -->
         <div class="control-wrapper">
           <!-- 切换歌词和唱片的按钮 -->
           <div class="dot-wrapper">
-            <span class="dot active"></span>
-            <span class="dot"></span>
+            <span class="dot" :class="{ active: !showLyric }"></span>
+            <span class="dot" :class="{ active: showLyric }"></span>
           </div>
           <!-- 进度条  -->
           <div class="progress-wrapper">
             <span class="current-time">{{ normalizeTime }}</span>
             <div class="progress-bar">
-              <progress-bar :percent="percent" @changeProgress="changeProgress" />
+              <progress-bar :percent="percent"
+                            @changeProgress="changeProgress"
+                            @updateTime="updateTime"
+              />
             </div>
             <span class="time">{{ duration }}</span>
           </div>
           <!-- 控制面板 -->
           <div class="control-panel">
             <div class="icon i-left">
-              <i class="icon-sequence"></i>
+              <i :class="iconMode" @click="changeMode"></i>
             </div>
             <div class="icon i-left">
               <i class="icon-prev" :class="disableCls" @click="prevOrNext()"></i>
@@ -76,43 +102,61 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <!-- // TODO: 播放按钮 -->
           <progress-circle :percent="percent" @togglePlaying="togglePlaying">
             <i :class="miniPlayIcon"></i>
           </progress-circle>
         </div>
         <div class="control">
-          <i class="icon-playlist"></i>
+          <i class="icon-playlist" @click.stop="showPlaylist"></i>
         </div>
       </div>
     </transition>
     <audio ref="audio"
            :src="currentSong.url"
-           @canplay="songReady = true"
+           @canplay="ready"
            @error="onSongError"
            @timeupdate="setCurrentTime"
+           @ended="automaticNext"
     ></audio>
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations } from 'vuex'
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 import animations from 'create-keyframe-animation'
+import { Base64 } from 'js-base64'
+import LyricParser from 'lyric-parser'
 import Util from '../../common/util'
+import Singer from '../../common/util/singer'
+import Storage from '../../common/util/cache'
+import { playMode, storageKey } from '../../common/config'
+import { getLyric } from '../../api/song'
+import { ERR_OK } from '../../api/config'
+import { modeMixin } from '../../common/util/mixin'
 
 import ProgressBar from '../../base/progress-bar/ProgressBar'
 import ProgressCircle from '../../base/progress-circle/ProgressCircle'
+import Scroll from '../../base/scroll/Scroll'
 
 const util = new Util()
+const storage = new Storage()
+const STORAGE_PLAY = storageKey.play
 
 const transform = util.prefixStyle('transform')
+const transition = util.prefixStyle('transition')
 
 export default {
+  mixins: [modeMixin],
   data() {
     return {
       songReady: false,
       currentTime: 0,
-      normalizeTime: '00:00'
+      normalizeTime: '00:00',
+      timeStopChange: false,
+      currentLyric: null,
+      lyricIndex: 0,
+      showLyric: false,
+      recordLyric: ''
     }
   },
   computed: {
@@ -136,9 +180,12 @@ export default {
     },
     ...mapState([
       'fullScreen',
-      'playList',
       'playing',
-      'currentIndex'
+      'currentIndex',
+      'playList',
+      'sequenceList',
+      'mode',
+      'singer'
     ]),
     ...mapGetters([
       'currentSong'
@@ -146,11 +193,28 @@ export default {
   },
   components: {
     ProgressBar,
-    ProgressCircle
+    ProgressCircle,
+    Scroll
   },
   methods: {
+    ready() {
+      this.songReady = true
+      // 搜索记录存储到本地
+      const arr = []
+      if (!storage.val(STORAGE_PLAY)) {
+        arr.push(this.currentSong)
+        storage.val(STORAGE_PLAY, arr)
+      }
+      this.savePlayHistory(this.currentSong)
+    },
+    showPlaylist() {
+      this.setShowPlaylist(true)
+    },
     togglePlaying() {
       this.setPlaying(!this.playing)
+      if (this.currentLyric) {
+        this.currentLyric.togglePlay()
+      }
     },
     back() {
       this.setFullScreen(false)
@@ -158,8 +222,24 @@ export default {
     unfold() {
       this.setFullScreen(true)
     },
+    automaticNext() {
+      if (this.mode === playMode.loop) {
+        this.loop()
+        return
+      }
+      this.prevOrNext(true)
+    },
+    loop() {
+      this.$refs.audio.currentTime = 0
+      this.$refs.audio.play()
+      this.currentLyric.seek(0)
+    },
     prevOrNext(isNext) {
       if (!this.songReady) {
+        return
+      }
+      if (this.playList.length === 1) {
+        this.loop()
         return
       }
       let index = this.currentIndex
@@ -184,16 +264,29 @@ export default {
       this.prevOrNext(true)
     },
     setCurrentTime(e) {
-      this.currentTime = e.target.currentTime
-      this.normalizeTime = util.normalizeTime(this.currentTime)
+      if (!this.timeStopChange) {
+        this.currentTime = e.target.currentTime
+        this.normalizeTime = util.normalizeTime(this.currentTime)
+      }
     },
     changeProgress(percent) {
-      this.$refs.audio.currentTime = this.currentSong.duration * percent
+      const time = this.currentSong.duration * percent
+      this.$refs.audio.currentTime = time
+      this.currentLyric.seek(time * 1000)
       if (!this.playing) {
         this.setPlaying(true)
       }
     },
-    // TODO: Plyer--methods
+    updateTime(percent) {
+      if (percent >= 0) {
+        this.timeStopChange = true
+        const CURRENT_TIME = this.currentSong.duration * percent
+        this.currentLyric.seek(CURRENT_TIME * 1000)
+        this.normalizeTime = util.normalizeTime(CURRENT_TIME)
+      } else {
+        this.timeStopChange = false
+      }
+    },
     enter(el, done) {
       const { x, y, scale } = this._getVariation()
 
@@ -233,6 +326,77 @@ export default {
       this.$refs.normalCD.style.transition = ''
       this.$refs.normalCD.style[transform] = ''
     },
+    showLyricStart(e) {
+      this.touch.init = 1
+      this.touch.startX = e.touches[0].pageX
+      this.touch.startY = e.touches[0].pageY
+      this.touch.innerWidth = window.innerWidth
+    },
+    showLyricMove(e) {
+      if (!this.touch.init) {
+        return ''
+      }
+      this.touch.init = 2
+      this.touch.moveX = e.touches[0].pageX - this.touch.startX
+      this.touch.moveY = e.touches[0].pageY - this.touch.startY
+      // 滑动的纵向距离大于横向距离时，不做任何处理
+      if (Math.abs(this.touch.moveY) > Math.abs(this.touch.moveX)) {
+        this.touch.init = 0
+        return ''
+      }
+
+      const innerWidth = this.touch.innerWidth
+      const left = this.showLyric ? -innerWidth : 0
+      // 设置歌词页面偏移量在[0, -innerWidth]
+      this.touch.offsetWidth = Math.min(Math.max(-innerWidth, left + this.touch.moveX), 0)
+      this.touch.percent = Math.abs(this.touch.offsetWidth / innerWidth)
+      this.$refs.lyricScroll.$el.style[transition] = ''
+      this.$refs.lyricScroll.$el.style[transform] = `translateX(${this.touch.offsetWidth}px)`
+    },
+    showLyricEnd() {
+      if (this.touch.init !== 2) {
+        return
+      }
+      let offsetWidth = 1
+      const innerWidth = this.touch.innerWidth
+      const percent = this.touch.percent
+      if (!this.showLyric) {
+        if (percent > 0.15) {
+          this.showLyric = true
+          offsetWidth = -innerWidth
+        } else {
+          offsetWidth = 0
+        }
+      } else {
+        if (percent < 0.85) {
+          this.showLyric = false
+          offsetWidth = 0
+        } else {
+          offsetWidth = -innerWidth
+        }
+      }
+      this.$refs.lyricScroll.$el.style[transition] = 'transform 150ms linear'
+      this.$refs.lyricScroll.$el.style[transform] = `translateX(${offsetWidth}px)`
+      this.$refs.recordBox.style.opacity = 1 - Math.abs(offsetWidth / innerWidth)
+      this.$refs.recordBox.style[transition] = 'opacity 100ms linear'
+
+      this.touch.init = 0
+    },
+    jumpSingerDetial() {
+      const id = this.currentSong.singer_mid
+      const singer = this.currentSong.singer
+      // 关闭播放器界面
+      this.setFullScreen(false)
+      if (id === this.singer.id) {
+        return
+      }
+
+      const singerUtil = new Singer(singer, id)
+      this.$router.push({
+        path: `/singer/${id}`
+      })
+      this.setSinger(singerUtil.addAvatar())
+    },
     _getVariation() {
       const miniCD = this.$refs.miniCD
       const normalCD = this.$refs.normalCD
@@ -256,24 +420,79 @@ export default {
         scale: SCALE
       }
     },
+    _getLyric() {
+      getLyric(this.currentSong.mid)
+        .then(res => {
+          if (res.code === ERR_OK) {
+            if (this.currentLyric) {
+              this.lyricIndex = 0
+              this.currentLyric.stop()
+            }
+            this.lyric = Base64.decode(res.lyric)
+            this.currentLyric = new LyricParser(this.lyric, this._lyricHandler)
+            if (this.playing) {
+              this.currentLyric.play()
+            }
+          }
+        })
+        .catch(e => {
+          this.currentLyric = null
+          this.lyricIndex = 0
+          this.recordLyric = ''
+        })
+    },
+    _lyricHandler({ lineNum, txt }) {
+      this.lyricIndex = lineNum
+      if (lineNum > 5) {
+        this.$refs.lyricScroll.scrollToElement(this.$refs.lyricLine[lineNum - 5], 1000)
+      } else {
+        this.$refs.lyricScroll.scrollTo(0, 0, 1000)
+      }
+      this.recordLyric = txt
+    },
     ...mapMutations([
       'setFullScreen',
       'setPlaying',
-      'setCurrentIndex'
+      'setCurrentIndex',
+      'setMode',
+      'setPlayList',
+      'setSinger',
+      'setShowPlaylist'
+    ]),
+    ...mapActions([
+      'savePlayHistory'
     ])
   },
+  created() {
+    this.touch = {}
+  },
   watch: {
-    currentSong() {
-      this.setPlaying(true)
-      this.$nextTick(() => {
-        this.$refs.audio.play()
-      })
+    // 播放的歌曲改变时，播放音乐
+    currentSong(now, old) {
+      if (now.id !== old.id && this.playList.length) {
+        this.setPlaying(true)
+        this.$nextTick(() => {
+          this.$refs.audio.play()
+        })
+
+        // 获取歌词
+        this._getLyric()
+      }
     },
     playing(currentPlaying) {
-      const audio = this.$refs.audio
       this.$nextTick(() => {
+        const audio = this.$refs.audio
         currentPlaying ? audio.play() : audio.pause()
       })
+    },
+    fullScreen(now) {
+      // 不显示播放器界面时，歌词界面偏移量设为0
+      if (!now) {
+        this.$refs.lyricScroll.$el.style[transform] = 'translateX(0px)'
+        this.$refs.recordBox.style.opacity = 1
+        // 表示是否显示歌词的标识符也设为false
+        this.showLyric = false
+      }
     }
   }
 }
@@ -302,6 +521,7 @@ export default {
     .title-wrapper {
       position relative
       height 60px
+      text-shadow 2px 2px 9px rgba(0, 0, 0, .9)
       .title {
         display flex
         height 40px
@@ -320,6 +540,10 @@ export default {
           flex 1
           text-align center
           line-height 40px
+          display -webkit-box
+          -webkit-box-orient vertical
+          -webkit-line-clamp 1
+          overflow hidden
         }
         &:after {
           content ''
@@ -331,6 +555,12 @@ export default {
         height 20px
         line-height 20px
         text-align center
+        display -webkit-box
+        -webkit-box-orient vertical
+        -webkit-line-clamp 1
+        width 80%
+        overflow hidden
+        margin 0 auto
       }
     }
     .player-body {
@@ -361,6 +591,40 @@ export default {
             }
             &.pause {
               animation-play-state paused
+            }
+          }
+        }
+        .record-lyric {
+          position absolute
+          display block
+          text-align center
+          bottom -67px
+          width 80%
+          font-size $font-size-medium
+          color $color-text-l
+          line-height 20px
+        }
+      }
+      .lyric-box {
+        position absolute
+        left 100%
+        top 0
+        width 100%
+        height 100%
+        line-height: 32px
+        color: $color-text-l
+        font-size: $font-size-medium
+        text-align center
+        overflow hidden
+        .lyric-wrapper {
+          width 80%
+          margin 0 auto
+          overflow hidden
+          .lyric {
+            &.active {
+              color $color-text
+              transition all 0.3s linear
+              transform scale(1.1)
             }
           }
         }

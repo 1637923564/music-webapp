@@ -1,7 +1,7 @@
 import { getUid } from '../common/util/uid'
 import { jsonpCommonParams, ERR_OK } from './config'
 import axios from 'axios'
-// TODO:api song
+
 export function getSongsUrl(songs) {
   const url = '/api/getPurlUrl'
 
@@ -30,7 +30,6 @@ export function getSongsUrl(songs) {
         comm: data,
         req_0: urlMid
       }).then(res => {
-        // console.log(res)
         const ret = res.data
         if (ret.code === ERR_OK) {
           const urlMid = ret.req_0
@@ -65,6 +64,25 @@ export function getSongsUrl(songs) {
       }
     }
     request()
+  })
+}
+
+export function getLyric(mid) {
+  const URL = '/api/lyric'
+  const params = Object.assign({}, jsonpCommonParams, {
+    songmid: mid,
+    platform: 'yqq',
+    hostUin: 0,
+    needNewCode: 0,
+    categoryId: 10000000,
+    pcachetime: +new Date(),
+    format: 'json'
+  })
+
+  return axios.get(URL, {
+    params
+  }).then((res) => {
+    return Promise.resolve(res.data)
   })
 }
 

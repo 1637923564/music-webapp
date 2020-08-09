@@ -23,7 +23,7 @@
                 v-for="(item, j) in group.list"
                 :key="j"
                 @click="selectSinger(item)"
-                >
+            >
               <img v-lazy="item.avatar" class="avatar">
               <span class="name">{{ item.name }} </span>
             </li>
@@ -57,12 +57,15 @@
 import Scroll from '../scroll/Scroll'
 import Util from '../../common/util'
 import Loading from '../loading/Loading'
+import { playListMixin } from '../../common/util/mixin'
+
 const util = new Util()
 
 const touch = {}
 const TITLE_HEIGHT = 30
 let currentIndex = null
 export default {
+  mixins: [playListMixin],
   data() {
     return {
       iIndex: 0,
@@ -81,6 +84,11 @@ export default {
     Loading
   },
   methods: {
+    whenPlayList(playList) {
+      const bottom = playList.length ? '60px' : ''
+      this.$refs.listView.$el.style.bottom = bottom
+      this.$refs.listView.refresh()
+    },
     // 事件：控制页面跳转到想要的位置
     controlPageJump(e) {
       // 通过获取.singer-group的索引来达到滚动的目的
@@ -90,7 +98,6 @@ export default {
         currentIndex = util.attr(e.target, 'index')
         this.$refs.listView.scrollToElement(this.$refs.listGroup[currentIndex], 250)
       } else if (e.type === 'touchmove') {
-        console.log(e.touches)
         // .singer-group的索引 = (滑动到的位置 - 触摸时的位置) / 被点击元素的高度
         touch.y2 = e.touches[0].clientY
         const currentIndex1 = Math.floor(Number(currentIndex) + (touch.y2 - touch.y1) / this.$refs.shortcut[0].clientHeight)

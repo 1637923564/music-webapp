@@ -6,8 +6,13 @@
           :key="index"
           @click="selectSong(item, index)"
       >
-        <span class="title">{{ item.name }}</span>
-        <span class="decription">{{ item.singer + ' - ' + item.album }}</span>
+        <div class="icon-wrapper" v-if="rank">
+          <span :class="computedIcon(index)" v-text="computedText(index)"></span>
+        </div>
+        <div class="info">
+          <span class="title">{{ item.name }}</span>
+          <span class="decription">{{ item.singer + ' - ' + item.album }}</span>
+        </div>
       </li>
     </ul>
     <div class="loading-wrapper" v-show="!songs.length">
@@ -25,6 +30,15 @@ export default {
       default: () => {
         return []
       }
+    },
+    rank: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    icon(index) {
+      return this.computedIcon(index)
     }
   },
   components: {
@@ -33,6 +47,18 @@ export default {
   methods: {
     selectSong(song, index) {
       this.$emit('selectSong', song, index)
+    },
+    computedIcon(index) {
+      if (index < 3) {
+        return 'icon icon' + index
+      } else {
+        return 'text'
+      }
+    },
+    computedText(index) {
+      if (index > 2) {
+        return index + 1
+      }
     }
   }
 }
@@ -46,19 +72,52 @@ export default {
   .list {
     padding 20px 30px
     .song {
-      height 64px
       display flex
-      flex-direction column
+      height 64px
       font-size $font-size-medium
-      span {
-        margin 5px 0
-        &.decription {
-          color $color-text-d
-          display -webkit-box
-          -webkit-box-orient vertical
-          -webkit-line-clamp 1
-          overflow hidden
-          width 90%
+      .icon-wrapper {
+        position relative
+        flex 0 0 55px
+        .icon {
+          display block
+          width 25px
+          height 25px
+          background-size contain
+          position absolute
+          top 10px
+          &.icon0 {
+            bg-img('0')
+          }
+          &.icon1 {
+            bg-img('1')
+          }
+          &.icon2 {
+            bg-img('2')
+          }
+        }
+        .text {
+          position absolute
+          font-size 18px
+          color $color-theme
+          top 15px
+          left 5px
+        }
+      }
+      .info {
+        flex 1
+        display flex
+        flex-direction column
+        height 100%
+        span {
+          margin 5px 0
+          &.decription {
+            color $color-text-d
+            display -webkit-box
+            -webkit-box-orient vertical
+            -webkit-line-clamp 1
+            overflow hidden
+            width 90%
+          }
         }
       }
     }

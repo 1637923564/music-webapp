@@ -2,7 +2,7 @@ import { getSongsUrl } from '../../api/song'
 // TODO:util song
 // 整理获取到的数据
 export default class Song {
-  constructor({ id, mid, singer, name, album, duration, image, url }) {
+  constructor({ id, mid, singer, name, album, duration, singerMid, image, url }) {
     this.id = id
     this.mid = mid
     this.singer = singer
@@ -10,6 +10,7 @@ export default class Song {
     this.album = album
     this.duration = duration
     this.image = image
+    this.singer_mid = singerMid
     this.filename = `C400${this.mid}.m4a`
     this.url = url
   }
@@ -28,11 +29,15 @@ export function createSong(musicData) {
     name: musicData.songname,
     album: musicData.albumname,
     duration: musicData.interval,
+    singerMid: musicData.singer[0].mid,
     image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
     url: musicData.url
   })
 }
-// 规范化歌手名
+/**
+ * 规范化歌手名
+ * @param {Array} singer 一个数组中包含对象，对象必须拥有name选项
+ */
 export function filterSinger(singer) {
   const ret = []
   if (!singer) {

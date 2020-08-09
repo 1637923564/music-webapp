@@ -7,7 +7,7 @@
     <div class="background" :style="bgStyle" ref="bg">
       <div class="mask" ref="mask"></div>
       <div class="play-wrapper" v-show="songs.length">
-        <div class="play-btn">
+        <div class="play-btn" @click="playAll">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -20,7 +20,7 @@
             class="song-scroll"
             ref="scroll"
             :tag="songs">
-      <song-list @selectSong="selectSong" :songs="songs" />
+      <song-list @selectSong="selectSong" :songs="songs" :rank="rank" />
     </scroll>
   </div>
 </template>
@@ -29,6 +29,7 @@
 import SongList from '../../base/song-list/SongList'
 import Scroll from '../../base/scroll/Scroll'
 import Util from '../../common/util'
+import { playListMixin } from '../../common/util/mixin'
 
 import { mapActions } from 'vuex'
 
@@ -38,6 +39,7 @@ const transform = util.prefixStyle('transform')
 const filter = util.prefixStyle('filter')
 
 export default {
+  mixins: [playListMixin],
   props: {
     bgImg: {
       type: String,
@@ -52,6 +54,10 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    rank: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -73,6 +79,11 @@ export default {
     this.minTranslate = -this.imageHeight + this.$refs.title.clientHeight
   },
   methods: {
+    whenPlayList(playList) {
+      const bottom = playList.length ? '60px' : ''
+      this.$refs.scroll.$el.style.bottom = bottom
+      this.$refs.scroll.refresh()
+    },
     selectSong(song, index) {
       this.selectPlay({ list: this.songs, index })
     },
@@ -80,14 +91,17 @@ export default {
       this.scrollY = coor.y
     },
     back() {
-      this.$router.push('/singer')
+      this.$router.go(-1)
+    },
+    playAll() {
+      this.selectPlayAll({ list: this.songs })
     },
     _setStyle() {
       this.imageHeight = this.$refs.bg.clientHeight
       this.$refs.scroll.$el.style.top = `${this.imageHeight}px`
       this.$refs.bgLayer.style.top = `${this.imageHeight}px`
     },
-    ...mapActions(['selectPlay'])
+    ...mapActions(['selectPlay', 'selectPlayAll'])
   },
   watch: {
     // 拖动列表时，各个元素的样式变化
@@ -129,7 +143,6 @@ export default {
 @import "../../common/stylus/mixin"
 
 .music-list {
-  touch-action none
   .title-wrapper {
     position absolute
     height 40px

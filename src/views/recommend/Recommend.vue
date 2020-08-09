@@ -16,7 +16,9 @@
           <ul class="recommend-list" v-if="recommendListData[0]">
             <li class="recommend-item"
                 v-for="(item, index) in recommendListData"
-                :key="index">
+                :key="index"
+                @click="selectDisc(item)"
+            >
               <div class="img-wrapper">
                 <img @load="!index && initBScroll()" v-lazy="item.imgurl">
               </div>
@@ -32,6 +34,9 @@
            v-show="!sliderData.length || !recommendListData.length">
         <loading />
       </div>
+      <transition name="slide">
+        <router-view />
+      </transition>
     </scroll>
   </div>
 </template>
@@ -42,8 +47,11 @@ import Scroll from '../../base/scroll/Scroll'
 import Loading from '../../base/loading/Loading'
 import { getTopBanner, getRecommendList } from '../../api/recommend'
 import { ERR_OK } from '../../api/config'
+import { playListMixin } from '../../common/util/mixin'
+import { mapMutations } from 'vuex'
 
 export default {
+  mixins: [playListMixin],
   data() {
     return {
       sliderData: [],
@@ -60,6 +68,17 @@ export default {
     this._getRecommendList()
   },
   methods: {
+    whenPlayList(playList) {
+      const bottom = playList.length ? '60px' : ''
+      this.$refs.scroll.$el.style.bottom = bottom
+      this.$refs.scroll.refresh()
+    },
+    selectDisc(disk) {
+      this.$router.push({
+        path: `/recommend/${disk.dissid}`
+      })
+      this.setDisk(disk)
+    },
     // 获取轮播图相关数据
     _getTopBanner() {
       getTopBanner()
@@ -81,7 +100,8 @@ export default {
     // 事件：初始化better-scroll
     initBScroll() {
       this.$refs.scroll.refresh()
-    }
+    },
+    ...mapMutations(['setDisk'])
   }
 }
 </script>
@@ -90,12 +110,11 @@ export default {
 @import '../../common/stylus/mixin';
 @import '../../common/stylus/variable';
 .recommend
-  position fixed
-  width 100%
-  top 88px
-  bottom 0
   .recommend-content
-    height 100%
+    position fixed
+    width 100%
+    top 88px
+    bottom 0
     overflow: hidden
     .slider-wrapper
       position relative
@@ -136,4 +155,11 @@ export default {
     height 100%
     width 100%
     flex-center()
+
+.slide-enter-active, .slide-leave-active {
+  transition transform .3s linear
+}
+.slide-enter, .slide-leave-to {
+  transform translate(100%, 0)
+}
 </style>
