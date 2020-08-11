@@ -3,6 +3,7 @@ import Storage from '../common/util/cache'
 
 const STORAGE_SEARCH = storageKey.search
 const STORAGE_PLAY = storageKey.play
+const STORAGE_COLLECT = storageKey.collect
 
 const storage = new Storage()
 
@@ -18,5 +19,6 @@ export default {
   rank: {},
   searchHistory: storage.val(STORAGE_SEARCH),
   showPlaylist: false, // 是否展示播放列表
-  playHistory: storage.val(STORAGE_PLAY)
+  playHistory: storage.val(STORAGE_PLAY),
+  collectList: storage.val(STORAGE_COLLECT)
 }

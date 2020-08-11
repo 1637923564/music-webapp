@@ -4,10 +4,15 @@ import Storage from '../common/util/cache'
 
 const storage = new Storage()
 const util = new Util()
+
 const STORAGE_SEARCH = storageKey.search
 const SEARCH_MAX_LENGTH = 15 // 搜索记录的最大长度
+
 const STORAGE_PLAY = storageKey.play
 const PLAY_MAX_LENGTH = 200
+
+const STORAGE_COLLECT = storageKey.collect
+const COLLECT_MAX_LENGTH = 2000
 
 function findIndex(list, item) {
   return list.findIndex(val => {
@@ -50,12 +55,13 @@ export default {
     commit('setPlaying', true)
   },
 
-  // 将歌曲插入到播放列表
-  insertSong({ commit, state }, song) {
+  // 插入歌曲
+  insertSong({ commit, state }, { song, playCurrentSong }) {
     // 深拷贝，防止修改原数组
     const [...playList] = state.playList
     const [...sequenceList] = state.sequenceList
     let currentIndex = state.currentIndex
+    let currentSongIndex = playCurrentSong ? currentIndex : undefined
     const currentSong = playList[currentIndex] // undefined
 
     // 获取播放列表中与插入歌曲相同的歌曲索引
@@ -67,11 +73,20 @@ export default {
     playList.splice(currentIndex, 0, song)
     // 删除播放列表中与插入歌曲相同的歌曲
     if (index > -1) {
-      if (index < currentIndex) {
-        playList.splice(index, 1)
-        currentIndex--
-      } else if (index >= currentIndex) {
-        playList.splice(index + 1, 1)
+      if (currentSongIndex === undefined) {
+        if (index < currentIndex) {
+          playList.splice(index, 1)
+          currentIndex--
+        } else if (index >= currentIndex) {
+          playList.splice(index + 1, 1)
+        }
+      } else {
+        if (index < currentSongIndex) {
+          playList.splice(index, 1)
+          currentSongIndex--
+        } else if (index >= currentSongIndex) {
+          playList.splice(index + 1, 1)
+        }
       }
     }
     // 将歌曲插入到sequenceList
@@ -90,11 +105,15 @@ export default {
       }
     }
 
+    if (currentSongIndex !== undefined) {
+      currentIndex = currentSongIndex
+    } else {
+      commit('setPlaying', true)
+      commit('setFullScreen', true)
+    }
     commit('setPlayList', playList)
     commit('setSequenceList', sequenceList)
     commit('setCurrentIndex', currentIndex)
-    commit('setPlaying', true)
-    commit('setFullScreen', true)
   },
 
   // 存储搜索历史到本地
@@ -158,5 +177,19 @@ export default {
       maxLen: PLAY_MAX_LENGTH,
       target: 'id'
     }))
+  },
+
+  collectSong({ commit, state }, song) {
+    const collectList = storage.insert({
+      key: STORAGE_COLLECT,
+      val: song,
+      maxLen: COLLECT_MAX_LENGTH,
+      target: 'id'
+    })
+    commit('setCollectList', collectList)
+  },
+
+  removeCollect({ commit, state }, index) {
+    commit('setCollectList', storage.remove(STORAGE_COLLECT, index))
   }
 }

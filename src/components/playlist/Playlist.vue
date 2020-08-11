@@ -12,19 +12,18 @@
           </span>
         </div>
         <scroll :tag="sequenceList" ref="scroll" class="list-wrapper">
-          <transition-group name="list" tag="ul" class="list">
+          <transition-group name="list" tag="ul" class="list" ref="songs">
             <li class="song"
                 v-for="(item, index) in sequenceList"
                 :key="item.id"
-                ref="song"
             >
               <span class="icon icon-left">
                 <i class="icon-play" v-show="currentPlay(index)"></i>
               </span>
-              <span class="song-name" @click="selectSong(item)">{{ item.name }}</span>
-              <span class="icon icon-right">
-                <i class="icon-not-favorite"></i>
-                <i class="icon-delete" @click.stop="delPlaylist(index)"></i>
+              <span class="song-name" @click="selectSong(item)" v-html="item.name"></span>
+              <span class="icon icon-right" @click="collect(item)">
+                <i :class="collectedStyle(item)"></i>
+                <i class="icon-delete" @click.stop="delItem(index)"></i>
               </span>
             </li>
           </transition-group>
@@ -44,6 +43,7 @@
                @confirm="cleanAll"
       />
       <add-song ref="addSong" />
+      <top-tip info="已移出播放列表" ref="topTip" />
     </div>
   </transition>
 </template>
@@ -51,14 +51,15 @@
 <script>
 import { mapState, mapMutations, mapGetters, mapActions } from 'vuex'
 import { playMode } from '../../common/config'
-import { modeMixin } from '../../common/util/mixin'
+import { modeMixin, collectMixin } from '../../common/util/mixin'
 
 import Scroll from '../../base/scroll/Scroll'
 import Confirm from '../../base/confirm/Confirm'
 import AddSong from '../../components/add-song/AddSong'
+import TopTip from '../../base/top-tip/TopTip'
 
 export default {
-  mixins: [modeMixin],
+  mixins: [modeMixin, collectMixin],
   computed: {
     playStatus() {
       switch (this.mode) {
@@ -85,9 +86,14 @@ export default {
   components: {
     Scroll,
     Confirm,
-    AddSong
+    AddSong,
+    TopTip
   },
   methods: {
+    delItem(index) {
+      this.$refs.topTip.show()
+      this.delPlaylist(index)
+    },
     showAddSong() {
       this.$refs.addSong.show()
     },
@@ -123,7 +129,7 @@ export default {
     },
     _scrollCurrent(interval) {
       const sequenceListIndex = this._currentPlay()
-      const el = this.$refs.song[sequenceListIndex]
+      const el = this.$refs.songs.$el.children[sequenceListIndex]
       this.$refs.scroll.scrollToElement(el, interval)
     },
     ...mapMutations([
@@ -216,6 +222,10 @@ export default {
               padding-left 10px
               color $color-text-l
               font-size 14px
+              display -webkit-box
+              -webkit-box-orient vertical
+              -webkit-line-clamp 1
+              overflow hidden
             }
             &.icon {
               color $color-theme
@@ -229,6 +239,9 @@ export default {
               display flex
               justify-content space-around
               align-items center
+              .icon-favorite {
+                color red
+              }
             }
           }
         }

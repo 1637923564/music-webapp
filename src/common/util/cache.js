@@ -27,7 +27,13 @@ export default class Storage {
    * @param {*} options.target 需要删除的对象的某个属性
    */
   insert(options) {
-    const data = this.val(options.key)
+    let data = []
+    if (!this.val(options.key)) {
+      data.push(options.val)
+      this.val(options.key, data)
+      return data
+    }
+    data = this.val(options.key)
     const target = options.target
     const type = Object.prototype.toString.call(options.val)
     const index = data.findIndex(item => {

@@ -149,7 +149,6 @@ export default {
     width 100%
     display flex
     font-size $font-size-large
-    // background $color-background-e
     z-index 30
     .back {
       flex 0 0 45px
@@ -159,7 +158,12 @@ export default {
     }
     .title {
       flex 1
-      flex-center()
+      display -webkit-box
+      -webkit-box-orient vertical
+      -webkit-line-clamp 1
+      overflow hidden
+      line-height 40px
+      text-align center
     }
     &:after {
       content ''

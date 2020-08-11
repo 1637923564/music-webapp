@@ -1,4 +1,4 @@
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import { playMode } from '../../common/config'
 import Util from '../util'
 
@@ -85,6 +85,41 @@ export const searchMixin = {
     },
     ...mapActions([
       'removeHistory'
+    ])
+  }
+}
+
+export const collectMixin = {
+  computed: {
+    ...mapState(['collectList']),
+    ...mapGetters(['currentSong'])
+  },
+  methods: {
+    collectedStyle(song) {
+      const index = this._getSameSong(song)
+      if (index > -1) {
+        return 'icon-favorite'
+      }
+      return 'icon-not-favorite'
+    },
+    collect(song) {
+      const index = this._getSameSong(song)
+      if (index > -1) {
+        this.removeCollect(index)
+      } else {
+        this.collectSong(song)
+      }
+    },
+    _getSameSong(song) {
+      const collectList = this.collectList || []
+      const index = collectList.findIndex(item => {
+        return item.id === song.id
+      })
+      return index
+    },
+    ...mapActions([
+      'removeCollect',
+      'collectSong'
     ])
   }
 }

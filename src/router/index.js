@@ -1,14 +1,25 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Rank from '../views/rank/Rank'
-import Recommend from '../views/recommend/Recommend'
-import Search from '../views/search/Search'
-import Singer from '../views/singer/Singer'
-import SingerDetail from '../views/singer-detail/SingerDetail.vue'
-import DiscDetail from '../views/disc-detail/DiskDetail.vue'
-import RankDetail from '../views/rank-detail/RankDetail.vue'
+// import Rank from '../views/rank/Rank'
+// import Recommend from '../views/recommend/Recommend'
+// import Search from '../views/search/Search'
+// import Singer from '../views/singer/Singer'
+// import SingerDetail from '../views/singer-detail/SingerDetail'
+// import DiscDetail from '../views/disc-detail/DiskDetail'
+// import RankDetail from '../views/rank-detail/RankDetail'
+// import MyCenter from '../views/my-center/MyCenter'
 
 Vue.use(VueRouter)
+
+// // 懒加载
+const Recommend = () => import('../views/recommend/Recommend')
+const Rank = () => import('../views/rank/Rank')
+const Search = () => import('../views/search/Search')
+const Singer = () => import('../views/singer/Singer')
+const SingerDetail = () => import('../views/singer-detail/SingerDetail')
+const DiscDetail = () => import('../views/disc-detail/DiskDetail')
+const RankDetail = () => import('../views/rank-detail/RankDetail')
+const MyCenter = () => import('../views/my-center/MyCenter')
 
 export default new VueRouter({
   routes: [
@@ -46,6 +57,10 @@ export default new VueRouter({
       children: [
         { path: ':id', component: SingerDetail }
       ]
+    },
+    {
+      path: '/center',
+      component: MyCenter
     }
   ]
 })

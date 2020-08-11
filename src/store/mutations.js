@@ -34,5 +34,8 @@ export default {
   },
   setPlayHistory(state, flag) {
     state.playHistory = flag
+  },
+  setCollectList(state, flag) {
+    state.collectList = flag
   }
 }

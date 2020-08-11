@@ -74,6 +74,7 @@ export default {
       height 100%
       top 0
       background #333
+      border-radius 6px
     }
     .search {
       font-size 24px

@@ -84,7 +84,7 @@
               <i class="icon-next" :class="disableCls" @click="prevOrNext(true)"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon icon-not-favorite"></i>
+              <i class="icon" :class="collectedStyle(currentSong)" @click="collect(currentSong)"></i>
             </div>
           </div>
         </div>
@@ -122,31 +122,28 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 import animations from 'create-keyframe-animation'
 import { Base64 } from 'js-base64'
 import LyricParser from 'lyric-parser'
 import Util from '../../common/util'
 import Singer from '../../common/util/singer'
-import Storage from '../../common/util/cache'
-import { playMode, storageKey } from '../../common/config'
+import { playMode } from '../../common/config'
 import { getLyric } from '../../api/song'
 import { ERR_OK } from '../../api/config'
-import { modeMixin } from '../../common/util/mixin'
+import { modeMixin, collectMixin } from '../../common/util/mixin'
 
 import ProgressBar from '../../base/progress-bar/ProgressBar'
 import ProgressCircle from '../../base/progress-circle/ProgressCircle'
 import Scroll from '../../base/scroll/Scroll'
 
 const util = new Util()
-const storage = new Storage()
-const STORAGE_PLAY = storageKey.play
 
 const transform = util.prefixStyle('transform')
 const transition = util.prefixStyle('transition')
 
 export default {
-  mixins: [modeMixin],
+  mixins: [modeMixin, collectMixin],
   data() {
     return {
       songReady: false,
@@ -186,9 +183,6 @@ export default {
       'sequenceList',
       'mode',
       'singer'
-    ]),
-    ...mapGetters([
-      'currentSong'
     ])
   },
   components: {
@@ -199,12 +193,6 @@ export default {
   methods: {
     ready() {
       this.songReady = true
-      // 搜索记录存储到本地
-      const arr = []
-      if (!storage.val(STORAGE_PLAY)) {
-        arr.push(this.currentSong)
-        storage.val(STORAGE_PLAY, arr)
-      }
       this.savePlayHistory(this.currentSong)
     },
     showPlaylist() {
@@ -683,6 +671,16 @@ export default {
           &.i-left {
             justify-content flex-end
           }
+          &.i-right {
+            position relative
+            i {
+              position absolute
+              left 0
+              &.icon-favorite {
+                color red
+              }
+            }
+          }
           &.i-center {
             flex 1.6
             font-size 40px
@@ -740,6 +738,10 @@ export default {
         height 20px
         font-size 14px
         line-height 20px
+        display -webkit-box
+        -webkit-box-orient vertical
+        -webkit-line-clamp 1
+        overflow hidden
       }
       .desc {
         margin-top 2px
@@ -747,6 +749,10 @@ export default {
         line-height 20px
         font-size 12px
         color $color-text-d
+        display -webkit-box
+        -webkit-box-orient vertical
+        -webkit-line-clamp 1
+        overflow hidden
       }
     }
     .control {

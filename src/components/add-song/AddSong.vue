@@ -16,15 +16,35 @@
                      :currentSelect="currentSelect"
       />
     </div>
+    <!-- 搜索结果 -->
     <div class="result-wrapper" v-show="query">
-      <search-result :showSinger="false" :query="query" />
+      <search-result :showSinger="false"
+                     :query="query"
+                     :playCurrentSong="playCurrentSong"
+                     @selectResult="selectResult"
+      />
     </div>
-    <div class="history-wrapper" v-show="!query && currentSelect === 1">
+    <!-- 搜索历史 -->
+    <scroll  ref="scrollSearch"
+             class="history-wrapper"
+             :tag="searchHistory"
+             v-show="!query && currentSelect === 1"
+    >
       <history-list :list="searchHistory"
                     @selectHistory="addQuery"
                     @removeOne="removeHistory"
       />
-    </div>
+    </scroll>
+    <!-- 播放历史 -->
+    <scroll ref="scrollPlay"
+            class="play-history-wrapper"
+            :tag="playHistory"
+            v-show="!query && currentSelect === 0"
+    >
+      <song-list class="song-list" @selectSong="selectSong"  :songs="playHistory" />
+    </scroll>
+
+    <top-tip info="歌曲添加成功" ref="topTip" />
   </div>
 </transition>
 </template>
@@ -36,22 +56,43 @@ import SearchResult from '../search-result/SearchResult'
 import SearchInput from '../../base/search-input/SearchInput'
 import HistoryList from '../../base/history-list/HistoryList'
 import ToggleButton from '../../base/toggle-button/ToggleButton'
+import SongList from '../../base/song-list/SongList'
+import Scroll from '../../base/scroll/Scroll'
+import TopTip from '../../base/top-tip/TopTip'
+
+import { mapState, mapActions } from 'vuex'
 
 export default {
   mixins: [searchMixin],
   data() {
     return {
       showFlag: false,
-      currentSelect: 0
+      currentSelect: 0,
+      playCurrentSong: true
     }
   },
   components: {
     SearchInput,
     SearchResult,
     HistoryList,
-    ToggleButton
+    ToggleButton,
+    SongList,
+    Scroll,
+    TopTip
+  },
+  computed: {
+    ...mapState(['playHistory'])
   },
   methods: {
+    selectResult(item) {
+      this.$refs.topTip.show()
+    },
+    selectSong(song, index) {
+      this.$refs.topTip.show()
+      // 是否播放当前歌曲
+      const playCurrentSong = this.playCurrentSong
+      this.insertSong({ song, playCurrentSong })
+    },
     toggleView(index) {
       this.currentSelect = index
     },
@@ -60,6 +101,13 @@ export default {
     },
     fade() {
       this.showFlag = false
+    },
+    ...mapActions(['insertSong'])
+  },
+  watch: {
+    currentSelect() {
+      this.$refs.scrollSearch.refresh()
+      this.$refs.scrollPlay.refresh()
     }
   }
 }
@@ -114,8 +162,23 @@ export default {
     bottom -60px
   }
   .history-wrapper {
-    margin-top 25px
+    position fixed
+    top 175px
+    bottom 0
+    width 100%
+    overflow hidden
     padding 0 30px
+    box-sizing border-box
+  }
+  .play-history-wrapper {
+    position fixed
+    top 175px
+    bottom 0
+    width 100%
+    overflow hidden
+    .song-list {
+      padding-top 0 !important
+    }
   }
 }
 </style>

@@ -6,5 +6,6 @@ export const playMode = {
 
 export const storageKey = {
   search: '__search__',
-  play: '__play__'
+  play: '__play__',
+  collect: '__collect__'
 }

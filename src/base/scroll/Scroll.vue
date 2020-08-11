@@ -1,5 +1,5 @@
 <template>
-  <div class="scroll" ref="scroll">
+  <div class="scroll" ref="scroll" @touchstart="toRefresh">
     <slot></slot>
   </div>
 </template>
@@ -37,6 +37,9 @@ export default {
     this._initScroll()
   },
   methods: {
+    toRefresh() {
+      this.refresh()
+    },
     // 初始化better-scroll
     _initScroll() {
       this.scroll = new BScroll(this.$refs.scroll, {
@@ -73,7 +76,9 @@ export default {
   },
   watch: {
     tag() {
-      this.refresh()
+      this.$nextTick(() => {
+        this.refresh()
+      })
     }
   }
 }

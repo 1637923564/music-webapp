@@ -1,6 +1,6 @@
 <template>
   <div class="song-list">
-    <ul class="list" v-if="songs.length">
+    <ul class="list" v-if="songs && songs.length">
       <li class="song"
           v-for="(item, index) in songs"
           :key="index"
@@ -15,7 +15,7 @@
         </div>
       </li>
     </ul>
-    <div class="loading-wrapper" v-show="!songs.length">
+    <div class="loading-wrapper" v-show="!songs || !songs.length">
       <loading/>
     </div>
   </div>
@@ -68,9 +68,8 @@ export default {
 @import '../../common/stylus/variable';
 @import '../../common/stylus/mixin';
 .song-list {
-  position relative
+  padding 20px 30px
   .list {
-    padding 20px 30px
     .song {
       display flex
       height 64px
@@ -110,6 +109,12 @@ export default {
         height 100%
         span {
           margin 5px 0
+          &.title {
+            display -webkit-box
+            -webkit-box-orient vertical
+            -webkit-line-clamp 1
+            overflow hidden
+          }
           &.decription {
             color $color-text-d
             display -webkit-box
@@ -123,9 +128,10 @@ export default {
     }
   }
   .loading-wrapper{
-    position fixed
-    top 263px
+    position absolute
+    top 0
     bottom 0
+    left 0
     width 100%
     flex-center()
   }

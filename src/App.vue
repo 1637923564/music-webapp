@@ -2,9 +2,11 @@
   <div class="app">
     <m-header />
     <tab />
-    <keep-alive>
-      <router-view />
-    </keep-alive>
+    <transition name="router-fade">
+      <keep-alive>
+        <router-view />
+      </keep-alive>
+    </transition>
     <player></player>
     <playlist />
   </div>
@@ -27,5 +29,10 @@ export default {
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-
+.router-fade-enter-active, .router-fade-leave-active {
+  transition all .7s ease
+}
+.router-fade-enter, .router-fade-leave-to {
+  opacity 0
+}
 </style>

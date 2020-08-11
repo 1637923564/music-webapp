@@ -1,9 +1,9 @@
 <template>
   <div class="history-box">
-    <ul class="list" v-if="list.length">
+    <transition-group name="list" tag="ul" class="list" v-if="list && list.length">
       <li class="history"
           v-for="(item, index) in list"
-          :key="index"
+          :key="item"
           @click="selectHistory(item)"
       >
         <span class="text">{{ item }}</span>
@@ -11,11 +11,14 @@
           <i class="icon-delete" @click.stop="removeOne(index)"></i>
         </span>
       </li>
-    </ul>
+    </transition-group>
+    <top-tip info="已删除搜索历史" ref="topTip" />
   </div>
 </template>
 
 <script>
+import TopTip from '../../base/top-tip/TopTip'
+
 export default {
   props: {
     list: {
@@ -25,11 +28,15 @@ export default {
       }
     }
   },
+  components: {
+    TopTip
+  },
   methods: {
     selectHistory(item) {
       this.$emit('selectHistory', item)
     },
     removeOne(index) {
+      this.$refs.topTip.show()
       this.$emit('removeOne', index)
     }
   }
@@ -46,6 +53,13 @@ export default {
       line-height 40px
       font-size 16px
       position relative
+      &.list-enter-active, &.list-leave-active {
+        transition all .3s linear
+      }
+      &.list-enter, &.list-leave-to {
+        height 0
+        opacity 0
+      }
       .icon {
         font-size 12px
         position absolute

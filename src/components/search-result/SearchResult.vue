@@ -31,23 +31,17 @@
 
 <script>
 import { search } from '../../api/search'
-import { filterSinger, processUrl } from '../../common/util/song'
+import { processUrl, isValidMusic, createSong } from '../../common/util/song'
 import { ERR_OK } from '../../api/config'
 import Singer from '../../common/util/singer'
 import { mapMutations, mapActions, mapState } from 'vuex'
 import { playListMixin } from '../../common/util/mixin'
-import Storage from '../../common/util/cache'
-import { storageKey } from '../../common/config'
 
 import Scroll from '../../base/scroll/Scroll'
 import Loading from '../../base/loading/Loading'
 
-const storage = new Storage()
-
 const PERPAGE = 20
 const TYPE_SINGER = 'singer'
-const NO_SINGER = true
-const STORAGE_SEARCH = storageKey.search
 
 export default {
   mixins: [playListMixin],
@@ -58,6 +52,10 @@ export default {
     showSinger: {
       type: Boolean,
       default: true
+    },
+    playCurrentSong: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -84,6 +82,7 @@ export default {
       this.$refs.scroll.refresh()
     },
     search() {
+      this.result = []
       this.page = 1
       this.hasMore = true
       this.info = ''
@@ -95,7 +94,7 @@ export default {
               this.info = '木有更多啦 /(ㄒoㄒ)/~~'
               return
             }
-            this.result = this._normalizeRes(res.data)
+            this._normalizeRes(res.data)
             this._hasMore(res.data.song)
           }
         })
@@ -114,7 +113,7 @@ export default {
               return
             }
             this.info = ''
-            this.result = this.result.concat(this._normalizeRes(res.data, NO_SINGER))
+            this._normalizeRes(res.data)
             this._hasMore(res.data.song)
           }
         })
@@ -125,9 +124,10 @@ export default {
     setSongName(item) {
       return item.type === TYPE_SINGER
         ? item.singername
-        : item.songname + ' - ' + filterSinger(item.singer)
+        : item.name + ' - ' + item.singer
     },
     selectResult(item) {
+      this.$emit('selectResult', item)
       if (item.type === TYPE_SINGER) {
         const singer = new Singer(item.singername, item.singermid)
 
@@ -137,13 +137,9 @@ export default {
           path: `/search/${item.singermid}`
         })
       } else {
-        // processUrl这个方法只能处理一个数组
-        const arr = []
-        arr.push(this._normalizeSong(item))
-        // 为歌曲信息添加歌曲播放地址
-        processUrl(arr).then(res => {
-          const song = res[0]
-          this.insertSong(song)
+        this.insertSong({
+          song: item,
+          playCurrentSong: this.playCurrentSong
         })
       }
 
@@ -151,41 +147,51 @@ export default {
       this._setHistory()
     },
     _setHistory() {
-      const arr = []
-      arr.push(this.query)
-      if (!storage.val(STORAGE_SEARCH)) {
-        storage.val(STORAGE_SEARCH, arr)
-      }
       this.saveSearchHistory(this.query)
     },
     _normalizeSong(song) {
-      return {
-        id: song.songid,
-        mid: song.songmid,
-        singer: filterSinger(song.singer),
-        name: song.songname,
-        album: song.albumname,
-        duration: song.interval,
-        singerMid: song.singer[0].mid,
-        image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${song.albummid}.jpg?max_age=2592000`,
-        url: song.url
-      }
+      return song
     },
     _hasMore(song) {
       if (song.curpage * PERPAGE >= song.totalnum) {
         this.hasMore = false
         this.info = '找不到更多的了 /(ㄒoㄒ)/~~'
+      } else {
+        if (!this.$refs.scroll.scroll.hasVerticalScroll) {
+          this.searchMore()
+        }
       }
     },
+    // TODO: normalizeSongs
     _normalizeRes(data, noSinger) {
-      let ret = []
+      const ret = []
       if (!noSinger && data.zhida && data.zhida.singermid) {
         ret.push({ ...data.zhida, ...{ type: TYPE_SINGER } })
       }
       if (data.song && data.song.list) {
-        ret = ret.concat(data.song.list)
+        const songs = data.song.list
+        songs.forEach(item => {
+          if (isValidMusic(item)) {
+            ret.push(createSong(item))
+          }
+        })
       }
-      return ret
+      let singer = null
+      if (ret[0] && ret[0].type === TYPE_SINGER) {
+        singer = ret.shift()
+      }
+      processUrl(ret).then(res => {
+        const ret = []
+        res.forEach(item => {
+          if (item.url) {
+            ret.push(item)
+          }
+        })
+        if (this.result.length === 0 && singer) {
+          ret.unshift(singer)
+        }
+        this.result = this.result.concat(ret)
+      })
     },
     ...mapMutations(['setSinger']),
     ...mapActions(['insertSong', 'saveSearchHistory'])
