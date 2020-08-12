@@ -146,41 +146,48 @@ export default {
     bottom 0
     width 100%
     overflow hidden
-    color $color-text-l
+    color #2e3c50
     touch-action: none
     .fixed-wrapper
       position absolute
       top 0
       left 0
       height 30px
-      font-size 12px
+      font-size 14px
       padding-left 20px
-      background #333
       width 100%
       box-sizing border-box
       line-height 30px
+      background rgb(243, 243, 243)
+      box-shadow 1px 1px 5px #aaa
+      .fixed-title {
+        font-weight bold
+        color #000
+      }
     .singer-group
       padding-bottom 30px
-      // touch-action: none
       .group-title
         height 30px
         padding-left 20px
-        background #333
         line-height 30px
-        font-size 12px
+        font-size 14px
+        background rgb(243, 243, 243)
+        font-weight bold
+        color #000
       ul
         .singer
-          padding 20px 0 0 30px
+          margin 20px 0 0 30px
           display flex
           align-items center
+          border-radius 25px
           .avatar
             width 50px
             height 50px
-            border-radius 50%
+            border-radius 12px
           .name
             margin-left 20px
             height 100%
-            font-size 14px
+            font-size 16px
 
   .singer-shortcut-wrapper
     position fixed
@@ -190,7 +197,7 @@ export default {
     display flex
     align-items center
     font-size 12px
-    color $color-text-l
+    color #fff
     .shortcut-list
       display flex
       padding 20px 0
@@ -198,7 +205,7 @@ export default {
       flex-direction column
       justify-content space-between
       align-items center
-      background $color-background-d
+      background rgba(0, 0, 0, .2)
       border-radius 10px
       box-sizing border-box
       .shortcut
@@ -206,5 +213,6 @@ export default {
         height 17px
         width 100%
         &.active
-          color $color-theme
+          color #6666ff
+          font-weight bold
 </style>

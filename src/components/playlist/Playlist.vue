@@ -20,7 +20,11 @@
               <span class="icon icon-left">
                 <i class="icon-play" v-show="currentPlay(index)"></i>
               </span>
-              <span class="song-name" @click="selectSong(item)" v-html="item.name"></span>
+              <span class="song-name"
+                    :class="isActive(index)"
+                    @click="selectSong(item)"
+                    v-html="item.name"
+              ></span>
               <span class="icon icon-right" @click="collect(item)">
                 <i :class="collectedStyle(item)"></i>
                 <i class="icon-delete" @click.stop="delItem(index)"></i>
@@ -32,8 +36,8 @@
           <i class="icon-add"></i>
           <span class="text">添加歌曲到队列</span>
         </div>
-        <div class="close" @click="close">
-          关闭
+        <div class="close">
+          <span class="text"  @click="close">关闭</span>
         </div>
       </div>
       <confirm title="是否清空播放列表？"
@@ -118,6 +122,13 @@ export default {
       }
       return false
     },
+    isActive(index) {
+      const currentIndex = this._currentPlay()
+      if (currentIndex === index) {
+        return 'active'
+      }
+      return ''
+    },
     close() {
       this.setShowPlaylist(false)
     },
@@ -169,9 +180,10 @@ export default {
   .playlist-wrapper {
     position absolute
     bottom 0
-    background #333
+    background #fafafa
     width 100%
-    border-radius 40px 40px 0 0
+    border-radius 14px 14px 0 0
+    box-shadow 0 -2px 5px #999
     .top-wrapper {
       height 30px
       padding 20px 30px 10px 20px
@@ -181,19 +193,21 @@ export default {
         padding-left 10px
         font-size 14px
         line-height 30px
-        color $color-text-ll
+        color #2c3e50
       }
       .icon-left {
-        color $color-theme
+        color #2c3e50
         font-size 30px
+        text-shadow 2px 2px 4px #aaa
       }
       .icon-right {
-        color $color-text-l
+        color #2c3e50
         font-size 12px
         line-height 30px
         display inline-block
         width 32px
         text-align center
+        text-shadow 2px 2px 4px #aaa
       }
     }
     .list-wrapper {
@@ -215,30 +229,37 @@ export default {
           span {
             text-align center
             line-height 40px
-            font-size 12px
             &.song-name {
               flex 1
               text-align left
               padding-left 10px
-              color $color-text-l
-              font-size 14px
+              color #2c3e50
+              font-size 15px
               display -webkit-box
               -webkit-box-orient vertical
               -webkit-line-clamp 1
               overflow hidden
+              &.active {
+                color #22d59c
+              }
             }
             &.icon {
-              color $color-theme
+              color #2c3e50
             }
             &.icon-left {
               display inline-block
-              width 14px
+              width 18px
+              color #22d59c
+              font-size 18px
             }
             &.icon-right {
               width 64px
               display flex
               justify-content space-around
               align-items center
+              .icon-delete {
+                font-size 12px
+              }
               .icon-favorite {
                 color red
               }
@@ -250,13 +271,13 @@ export default {
     .add-btn {
       width 140px
       height 30px
-      border 1px solid $color-text-l
+      border 1px solid #2c3e50
       border-radius 15px
       line-height 30px
       text-align center
       font-size 12px
       margin 30px auto
-      color $color-text-l
+      color #2c3e50
       box-sizing border-box
       .text {
         margin-left 10px
@@ -265,9 +286,17 @@ export default {
     .close {
       height 50px
       text-align center
-      line-height 50px
       font-size 16px
-      background #222
+      .text {
+        background #fff
+        display inline-block
+        width 75%
+        height 30px
+        border-radius 15px
+        box-shadow 1px 1px 10px #eee
+        // border 1px solid #eee
+        line-height 30px
+      }
     }
   }
 }

@@ -64,7 +64,6 @@ export default {
   width 100%
   height 100%
   z-index 1000
-  background $color-background
-  color #fff
+  color #2c3e50
 }
 </style>

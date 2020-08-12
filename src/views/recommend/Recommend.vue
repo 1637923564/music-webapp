@@ -124,22 +124,27 @@ export default {
       .list-title
         height 65px
         flex-center()
-        font-size 14px
-        color $color-theme
+        font-size 16px
+        font-weight bold
+        color #2c3e50
       .recommend-list
         .recommend-item
           display flex
           height 63px
-          padding 0 20px 20px 20px
+          margin 0 20px 20px 20px
+          border-radius 10px
+          // border 1px solid #ccc
+          // box-shadow 1px 1px 5px #eee
           .img-wrapper
             padding-right 20px
             img
               height 60px
+              border-radius 10px
           .text-wrapper
             display flex
             flex-direction column
             justify-content space-around
-            font-size 14px
+            font-size 15px
             flex 1
             height 100%
             .title
@@ -148,7 +153,8 @@ export default {
               -webkit-line-clamp 1
               overflow hidden
             .info
-              color $color-text-l
+              color #999999
+              font-size 13px
   .loading-wrapper
     position absolute
     top 0

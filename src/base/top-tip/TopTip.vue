@@ -63,6 +63,7 @@ export default {
   width 210px
   color rgb(152,195,121)
   font-weight bold
+  box-shadow 1px 1px 3px #aaa
   flex-center()
   .icon {
     font-weight bold

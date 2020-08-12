@@ -27,8 +27,8 @@ export default {
 .tab {
   display flex
   height 44px
-  color $color-text-l
-  font-size 14px
+  color #2c3e50
+  font-size 15px
   .tab-item {
     flex 1
     height 100%
@@ -36,6 +36,8 @@ export default {
     .tab-link {
       padding-bottom 5px}
     &.router-link-active>.tab-link {
-      color: $color-theme
-      border-bottom: 2px solid $color-theme}}}
+      color: #22d59c
+      border-bottom: 3px solid #22d59c
+      font-size 16px
+      font-weight bold}}}
 </style>

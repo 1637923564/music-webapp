@@ -80,6 +80,9 @@ export const searchMixin = {
     getQuery(query) {
       this.query = query
     },
+    selectResult(item) {
+      this.$refs.input.blur()
+    },
     addQuery(val) {
       this.$refs.input.addVal(val)
     },

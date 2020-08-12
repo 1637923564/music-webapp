@@ -24,7 +24,7 @@ export default {
   width 100%
   bottom 0
   top 125px
-  background #222
+  background rgb(250, 250, 250)
   flex-center()
   .text {
     font-size 20px

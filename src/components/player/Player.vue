@@ -7,6 +7,7 @@
                 @after-leave="afterLeave"
     >
       <div class="normal-palyer" v-show="fullScreen">
+        <div class="black-mask"></div>
         <div class="background-wrapper">
           <img :src="currentSong.image">
         </div>
@@ -490,6 +491,7 @@ export default {
 @import '../../common/stylus/variable';
 @import '../../common/stylus/mixin';
 .player {
+  color #fff
   .normal-palyer {
     position fixed
     width 100%
@@ -497,6 +499,14 @@ export default {
     bottom: 0
     background $color-background
     z-index 1000
+    .black-mask {
+      position fixed
+      top 0
+      width 100%
+      bottom 0
+      background rgba(50, 50, 50, .3)
+      z-index 100
+    }
     .background-wrapper {
       z-index -1
       img {
@@ -509,7 +519,7 @@ export default {
     .title-wrapper {
       position relative
       height 60px
-      text-shadow 2px 2px 9px rgba(0, 0, 0, .9)
+      z-index 101
       .title {
         display flex
         height 40px
@@ -519,7 +529,6 @@ export default {
           justify-content flex-end
           align-items center
           font-size 22px
-          color $color-theme
           i {
             transform rotate(-90deg)
           }
@@ -556,6 +565,7 @@ export default {
       width 100%
       top 85px
       bottom 170px
+      z-index 101
       .record-box {
         position relative
         display flex
@@ -610,7 +620,7 @@ export default {
           overflow hidden
           .lyric {
             &.active {
-              color $color-text
+              color #22d59c
               transition all 0.3s linear
               transform scale(1.1)
             }
@@ -619,6 +629,7 @@ export default {
       }
     }
     .control-wrapper {
+      z-index 101
       position absolute
       bottom 50px
       width 100%
@@ -658,7 +669,7 @@ export default {
         }
       }
       .control-panel {
-        color $color-theme
+        color #22d59c
         height 40px
         display flex
         .icon {
@@ -687,7 +698,7 @@ export default {
             flex-center()
           }
           .disable {
-            color $color-theme-d
+            color #22d59c45
           }
         }
       }
@@ -714,9 +725,11 @@ export default {
     align-items center
     width 100%
     height 60px
-    background #333
+    background rgb(243,243,243)
     bottom 0
     z-index 1000
+    border-radius 30px
+    box-shadow -2px 1px 10px #bbb
     .img-wrapper {
       float left
       padding 0 10px 0 20px
@@ -742,6 +755,7 @@ export default {
         -webkit-box-orient vertical
         -webkit-line-clamp 1
         overflow hidden
+        color #2c3e50
       }
       .desc {
         margin-top 2px
@@ -753,6 +767,7 @@ export default {
         -webkit-box-orient vertical
         -webkit-line-clamp 1
         overflow hidden
+        color #777
       }
     }
     .control {
@@ -760,7 +775,7 @@ export default {
       width 50px
       height 32px
       font-size 32px
-      color $color-theme
+      color #2c3e50
       box-sizing border-box
       padding 0 10px
       &:nth-child(3) i {

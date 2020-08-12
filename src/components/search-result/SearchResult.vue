@@ -214,6 +214,7 @@ export default {
   padding 10px 30px 0 30px
   font-size 14px
   overflow hidden
+  color #2c3e50
   .list {
     .item {
       margin-bottom 20px

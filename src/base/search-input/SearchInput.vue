@@ -4,7 +4,7 @@
       <span class="search">
         <i class="icon-search"></i>
       </span>
-      <input type="text" :placeholder="placeholder" v-model="query">
+      <input ref="input" type="text" :placeholder="placeholder" v-model="query">
       <span  class="clear" v-if="query">
         <i @click="clearVal" class="icon-dismiss"></i>
       </span>
@@ -36,6 +36,9 @@ export default {
     // 给内容框直接添加内容
     addVal(val) {
       this.query = val
+    },
+    blur() {
+      this.$refs.input.blur()
     }
   },
   created() {
@@ -58,14 +61,17 @@ export default {
     input {
       width 100%
       height 100%
-      background #333
+      background #fff
       border-radius 6px
       padding-left 40px
       box-sizing border-box
       border none
       outline medium
-      color #ccc
+      color #2c3e50
       font-size 14px
+      &::placeholder {
+        color #999
+      }
     }
     .search, .clear {
       position absolute
@@ -73,7 +79,7 @@ export default {
       width 40px
       height 100%
       top 0
-      background #333
+      background #fff
       border-radius 6px
     }
     .search {

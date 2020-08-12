@@ -39,6 +39,7 @@ export default {
   border-radius 5px
   border 1px solid #333
   box-sizing border-box
+  color #2c3e50
   .btn {
     flex 1
     text-align center

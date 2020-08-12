@@ -105,7 +105,7 @@ export default {
   position relative
   .progress {
     height 100%
-    background $color-theme
+    background #22d59c
     width 0
   }
   .progress-btn {
@@ -120,7 +120,7 @@ export default {
     .progress-btn-center {
       width 50%
       height 50%
-      background $color-theme
+      background #22d59c
       border-radius 50%
     }
   }

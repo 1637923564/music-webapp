@@ -116,13 +116,13 @@ export default {
 <style lang="stylus" scoped>
 @import '../../common/stylus/variable';
 .add-song {
-  color $color-text-l
+  color #2c3e50
   z-index 20000
   position fixed
   top 0
   bottom 0
   width 100%
-  background $color-background
+  background rgb(247,247,247)
   &.slide-enter-active, &.slide-leave-active {
     transition all .3s linear
   }
@@ -147,7 +147,7 @@ export default {
       text-align center
       line-height 44px
       padding-right 7px
-      color $color-theme
+      color #2c3e50
       font-size 20px
     }
   }

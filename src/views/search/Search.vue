@@ -29,7 +29,7 @@
         </div>
       </div>
     </scroll>
-    <search-result class="search-bar" v-show="query" :query="query" />
+    <search-result @selectResult="selectResult" class="search-bar" v-show="query" :query="query" />
     <transition name="slide">
       <router-view />
     </transition>
@@ -104,7 +104,7 @@ export default {
 <style lang="stylus" scoped>
 @import '../../common/stylus/variable';
 .search {
-  color $color-text-d
+  color #2c3e50
   .shortcut {
     position fixed
     top 168px
@@ -117,6 +117,7 @@ export default {
       font-size 14px
       .title {
         margin 20px 0
+        font-weight bold
       }
       .hot-list {
         .text {
@@ -124,7 +125,9 @@ export default {
           padding 5px 10px
           margin 0px 20px 10px 0
           border-radius 5px
-          background #333
+          background #fff
+          color #22d59c
+          box-shadow 1px 1px 5px rgba(225, 225, 225, .5)
         }
       }
     }
@@ -136,6 +139,9 @@ export default {
         line-height 40px
         font-size 14px
         width 100%
+        .text {
+          font-weight bold
+        }
         .clear {
           position absolute
           right 0

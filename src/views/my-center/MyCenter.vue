@@ -134,9 +134,9 @@ export default {
   width 100%
   top 0
   left 0
-  background #222
+  background rgb(250,250,250)
   z-index 1000
-  color $color-text-d
+  color #2c3e50
   .top-wrapper {
     height 32px
     margin 10px 0 30px 0

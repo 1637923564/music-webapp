@@ -1,7 +1,7 @@
 <template>
   <div class="m-header">
     <div class="logo"></div>
-    <div class="title">Chicken Music</div>
+    <div class="title">OwnMusic</div>
     <div class="center-btn">
       <router-link to="/center" tag="i" class="icon-mine"></router-link>
     </div>
@@ -13,18 +13,21 @@
 @import '../../common/stylus/mixin'
 .m-header {
   height 44px
-  color $color-theme
-  flex-center()
+  color #2c3e50
+  display flex
+  align-items center
   .logo {
     display inline-block
-    width 30px
-    height 32px
-    margin-right 9px
-    bg-img('./logo')
-    background-size 30px 32px
+    margin-left 11px
+    width 40px
+    height 44px
+    margin-right 1px
+    background-image url('./logo1.png')
+    background-size 40px 40px
   }
   .title {
-    font-size $font-size-large
+    font-size 21px
+    color #22d59c
   }
   .center-btn {
     position absolute

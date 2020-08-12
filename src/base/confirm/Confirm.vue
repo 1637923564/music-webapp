@@ -62,22 +62,22 @@ export default {
   .confirm-wrapper {
     width 270px
     border-radius 20px
-    background #333
+    background #fff
     .title {
       min-height 60px
       flex-center()
       padding 20px
-      color $color-text-l
+      color #2c3e50
       box-sizing border-box
     }
     .control {
       height 43px
-      border-top 1px solid $color-background-d
-      color $color-text-l
+      border-top 1px solid #ddd
+      color #777
       display flex
       .confirm-btn {
         flex 1
-        border-right 1px solid $color-background-d
+        border-right 1px solid #ddd
         flex-center()
       }
       .cancel-btn {

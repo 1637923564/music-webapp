@@ -12,6 +12,7 @@
             <div class="image"><img v-lazy="top.picUrl"></div>
             <!-- 内容 -->
             <div class="detail">
+              <h1 class="title">{{ top.topTitle }}</h1>
               <span class="text" v-for="(info, j) in top.songList" :key="j">
                 {{ j + 1 }}. {{ info.singername }} - {{ info.songname }}
               </span>
@@ -86,17 +87,19 @@ export default {
   overflow hidden
   .rank-wrapper {
     .list {
+      padding-top 12px
       .rank {
         margin 20px 20px 0 20px
         height 100px
         display flex
-        background #333
+        background #fff
         border-radius 10px
         .image {
           flex 0 0 100px
           img {
             width 100px
             height 100px
+            border-radius 10px 0 0 10px
           }
         }
         .detail {
@@ -105,16 +108,22 @@ export default {
           display flex
           flex-direction column
           justify-content center
+          .title {
+            padding 0 20px
+            font-weight bold
+            color #000
+            padding-bottom 10px
+          }
           .text {
             display -webkit-box
             -webkit-box-orient vertical
             -webkit-line-clamp 1
             overflow hidden
-            height 26px
+            height 20px
             padding 0 20px
-            font-size $font-size-small
-            line-height 26px
-            color $color-text-d
+            font-size 14px
+            line-height 20px
+            color #2c3e50
           }
         }
       }

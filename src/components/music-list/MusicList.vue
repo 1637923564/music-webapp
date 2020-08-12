@@ -122,14 +122,22 @@ export default {
 
       // 0 < opacity <= 1 : 向上拉动，scroll(被拖动的盒子)滚动到顶部之前
       if (opacity >= 0.4 && opacity <= 1) {
-        this.$refs.mask.style.background = `rgba(34, 34, 34, ${opacity})`
+        const maskC = Math.ceil(Math.pow(opacity, 2) * 250)
+        const titleC = Math.floor(Math.pow((1 - opacity + 0.4), 2) * 250)
+        this.$refs.mask.style.background = `rgba(${maskC}, ${maskC}, ${maskC}, ${opacity})`
+        this.$refs.title.style.color = `rgb(${titleC}, ${titleC}, ${titleC})`
       }
-
       // currentY < this.minTranslate : 向上拖动，scroll已经超出了顶部
       if (currentY < this.minTranslate) {
-        this.$refs.title.style.background = `rgba(34, 34, 34, ${opacity})`
+        this.$refs.title.style.background = `rgba(250, 250, 250, ${opacity})`
+        this.$refs.title.style.color = 'rgb(0, 0, 0)'
       } else {
         this.$refs.title.style.background = null
+      }
+      if (currentY >= 0) {
+        this.$refs.mask.style.background = 'rgba(41, 41, 41, .3)'
+        this.$refs.bg.style[filter] = 'blur(0)'
+        this.$refs.title.style.color = 'rgb(250, 250, 250)'
       }
       const translate = Math.max(currentY, this.minTranslate)
       this.$refs.bgLayer.style[transform] = `translateY(${translate}px)`
@@ -143,6 +151,7 @@ export default {
 @import "../../common/stylus/mixin"
 
 .music-list {
+  background rgba(250,250,250,1)
   .title-wrapper {
     position absolute
     height 40px
@@ -150,10 +159,10 @@ export default {
     display flex
     font-size $font-size-large
     z-index 30
+    color #fff
     .back {
       flex 0 0 45px
       flex-center()
-      color $color-theme
       font-size 22px
     }
     .title {
@@ -164,6 +173,7 @@ export default {
       overflow hidden
       line-height 40px
       text-align center
+      font-weight bold
     }
     &:after {
       content ''
@@ -181,18 +191,18 @@ export default {
       width 100%
       top 0
       bottom 0
-      background $color-background-e
+      background rgba(41, 41, 41, 0.3)
     }
     .play-wrapper {
       position absolute
       bottom 20px
       flex-center()
-      color $color-theme
+      color #22d59c
       width 100%
       .play-btn {
         width 135px
         height 32px
-        border 1px solid $color-theme
+        border 2px solid #22d59c
         border-radius 32px
         flex-center()
         .icon-play {
@@ -207,7 +217,7 @@ export default {
   }
   .bg-layer {
     position absolute
-    background $color-background
+    background rgba(250,250,250, 1)
     width 100%
     height 100%
   }

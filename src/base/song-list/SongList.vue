@@ -68,6 +68,7 @@ export default {
 @import '../../common/stylus/variable';
 @import '../../common/stylus/mixin';
 .song-list {
+  background rgba(250,250,250,1)
   padding 20px 30px
   .list {
     .song {
@@ -97,7 +98,7 @@ export default {
         .text {
           position absolute
           font-size 18px
-          color $color-theme
+          color #2c3e50
           top 15px
           left 5px
         }
@@ -114,9 +115,10 @@ export default {
             -webkit-box-orient vertical
             -webkit-line-clamp 1
             overflow hidden
+            font-size 16px
           }
           &.decription {
-            color $color-text-d
+            color #aaa
             display -webkit-box
             -webkit-box-orient vertical
             -webkit-line-clamp 1

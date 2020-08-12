@@ -46,7 +46,7 @@ export default {
 <style lang="stylus" scoped>
 @import '../../common/stylus/variable';
 .history-box {
-  color $color-text-l
+  color #2c3e50
   .list {
     .history {
       height 40px
