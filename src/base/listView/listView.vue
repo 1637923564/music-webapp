@@ -213,6 +213,6 @@ export default {
         height 17px
         width 100%
         &.active
-          color #6666ff
+          color #22d59c
           font-weight bold
 </style>

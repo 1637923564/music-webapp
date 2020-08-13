@@ -1,6 +1,7 @@
 const express = require('express')
 const axios = require('axios')
 const bodyParser = require('body-parser')
+const compression = require('compression')
 
 const app = express()
 
@@ -10,6 +11,7 @@ const ERR_OK = 0
 app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
+app.use(compression())
 app.use(express.static('./dist'))
 
 app.post('/api/getTopBanner', (req, res) => {
@@ -150,6 +152,4 @@ app.get('/api/search', function (req, res) {
   })
 })
 
-app.listen(3000, () => {
-  console.log('http://localhost:3000')
-})
+app.listen(3000)

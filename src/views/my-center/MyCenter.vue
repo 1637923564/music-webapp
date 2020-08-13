@@ -145,7 +145,7 @@ export default {
       position absolute
       font-size 22px
       padding-left 15px
-      color $color-theme
+      color #2c3e50
     }
     .toggle-wrapper {
       font-size 14px

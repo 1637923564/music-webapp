@@ -30,7 +30,7 @@ export default {
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
 .router-fade-enter-active, .router-fade-leave-active {
-  transition all .7s ease
+  transition all .2s ease
 }
 .router-fade-enter, .router-fade-leave-to {
   opacity 0
