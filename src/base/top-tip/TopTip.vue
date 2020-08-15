@@ -55,8 +55,8 @@ export default {
 <style lang="stylus" scoped>
 @import '../../common/stylus/mixin';
 .top-tip {
-  position fixed
-  top 25px
+  position fixed !important
+  top 25px !important
   background-color #fff
   border-radius 3px
   padding 7px 0

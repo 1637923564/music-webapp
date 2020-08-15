@@ -12,12 +12,10 @@
         </span>
       </li>
     </transition-group>
-    <top-tip info="已删除搜索历史" ref="topTip" />
   </div>
 </template>
 
 <script>
-import TopTip from '../../base/top-tip/TopTip'
 
 export default {
   props: {
@@ -28,15 +26,11 @@ export default {
       }
     }
   },
-  components: {
-    TopTip
-  },
   methods: {
     selectHistory(item) {
       this.$emit('selectHistory', item)
     },
     removeOne(index) {
-      this.$refs.topTip.show()
       this.$emit('removeOne', index)
     }
   }

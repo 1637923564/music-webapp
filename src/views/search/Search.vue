@@ -1,5 +1,6 @@
 <template>
-  <div class="search">
+  <div class="search" @click="searchInputBlur">
+    <top-tip info="已删除搜索历史" ref="topTip" />
     <search-input ref="input" @getQuery="getQuery" />
     <scroll ref="scroll" class="shortcut" v-show="!query" :tag="tag">
       <div>
@@ -24,7 +25,7 @@
           </h1>
           <history-list :list="searchHistory"
                         @selectHistory="addQuery"
-                        @removeOne="removeHistory"
+                        @removeOne="emptyHistory"
           />
         </div>
       </div>
@@ -52,6 +53,7 @@ import SearchResult from '../../components/search-result/SearchResult'
 import Scroll from '../../base/scroll/Scroll'
 import HistoryList from '../../base/history-list/HistoryList'
 import Confirm from '../../base/confirm/Confirm'
+import TopTip from '../../base/top-tip/TopTip'
 
 export default {
   mixins: [playListMixin, searchMixin],
@@ -60,7 +62,8 @@ export default {
     SearchResult,
     Scroll,
     HistoryList,
-    Confirm
+    Confirm,
+    TopTip
   },
   computed: {
     tag() {
@@ -68,9 +71,13 @@ export default {
     }
   },
   methods: {
-    emptyHistory() {
+    searchInputBlur() {
+      this.$refs.input.blur()
+    },
+    emptyHistory(index) {
+      this.$refs.topTip.show()
       // 确认清空搜索历史
-      this.removeHistory()
+      this.removeHistory(index)
     },
     showConfirm() {
       this.$refs.confirm.show()

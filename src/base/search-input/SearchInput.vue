@@ -1,5 +1,5 @@
 <template>
-  <div class="search-input">
+  <div class="search-input" @click.stop>
     <div class="search-box">
       <span class="search">
         <i class="icon-search"></i>
