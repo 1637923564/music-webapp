@@ -246,7 +246,7 @@ export default {
         }
       }
       this.setCurrentIndex(index)
-      this.songReady = false
+      // this.songReady = false
     },
     onSongError() {
       this.songReady = true
@@ -419,7 +419,7 @@ export default {
             }
             this.lyric = Base64.decode(res.lyric)
             this.currentLyric = new LyricParser(this.lyric, this._lyricHandler)
-            if (this.playing) {
+            if (this.songReady) {
               this.currentLyric.play()
             }
           }
@@ -459,6 +459,7 @@ export default {
     // 播放的歌曲改变时，播放音乐
     currentSong(now, old) {
       if (now.id !== old.id && this.playList.length) {
+        this.songReady = false
         this.setPlaying(true)
         this.$nextTick(() => {
           this.$refs.audio.play()
@@ -481,6 +482,20 @@ export default {
         this.$refs.recordBox.style.opacity = 1
         // 表示是否显示歌词的标识符也设为false
         this.showLyric = false
+      }
+    },
+    songReady(now) {
+      if (now) {
+        if (this.currentLyric) {
+          this.currentLyric.play()
+          this.currentLyric.seek(this.currentTime * 1000)
+        }
+      }
+    },
+    currentLyric(now, old) {
+      if (now !== old) {
+        this.currentLyric.play()
+        this.currentLyric.seek(this.currentTime * 1000)
       }
     }
   }
