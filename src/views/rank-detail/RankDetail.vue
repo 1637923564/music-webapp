@@ -11,8 +11,10 @@ import { isValidMusic, createSong, processUrl } from '../../common/util/song'
 
 import MusicList from '../../components/music-list/MusicList'
 import { ERR_OK } from '../../api/config'
+import { closePlayerByRouter } from '../../common/util/mixin'
 
 export default {
+  mixins: [closePlayerByRouter],
   data() {
     return {
       songs: []

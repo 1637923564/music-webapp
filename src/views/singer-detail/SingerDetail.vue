@@ -10,7 +10,9 @@ import { mapState } from 'vuex'
 import { createSong, isValidMusic, processUrl } from '../../common/util/song'
 import { getSingerDetail } from '../../api/singer'
 import { ERR_OK } from '../../api/config'
+import { closePlayerByRouter } from '../../common/util/mixin'
 export default {
+  mixins: [closePlayerByRouter],
   data() {
     return {
       songs: []

@@ -1,4 +1,4 @@
-import { mapState, mapActions, mapGetters } from 'vuex'
+import { mapState, mapActions, mapGetters, mapMutations } from 'vuex'
 import { playMode } from '../../common/config'
 import Util from '../util'
 
@@ -124,5 +124,22 @@ export const collectMixin = {
       'removeCollect',
       'collectSong'
     ])
+  }
+}
+
+export const closePlayerByRouter = {
+  computed: {
+    ...mapState(['fullScreen'])
+  },
+  methods: {
+    ...mapMutations(['setFullScreen'])
+  },
+  beforeRouteLeave (to, from, next) {
+    if (this.fullScreen) {
+      this.setFullScreen(false)
+      next(false)
+    } else {
+      next()
+    }
   }
 }
