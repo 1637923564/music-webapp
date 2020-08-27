@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '../store'
 // import Rank from '../views/rank/Rank'
 // import Recommend from '../views/recommend/Recommend'
 // import Search from '../views/search/Search'
@@ -21,7 +22,7 @@ const DiscDetail = () => import('../views/disc-detail/DiskDetail')
 const RankDetail = () => import('../views/rank-detail/RankDetail')
 const MyCenter = () => import('../views/my-center/MyCenter')
 
-export default new VueRouter({
+const router = new VueRouter({
   routes: [
     { path: '/', redirect: '/recommend' },
     {
@@ -64,3 +65,14 @@ export default new VueRouter({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (store.state.fullScreen) {
+    store.commit('setFullScreen', false)
+    next(false)
+  } else {
+    next()
+  }
+})
+
+export default router

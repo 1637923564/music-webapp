@@ -46,7 +46,7 @@
 <script>
 import { getHotKey } from '../../api/search'
 import { ERR_OK } from '../../api/config'
-import { playListMixin, searchMixin, closePlayerByRouter } from '../../common/util/mixin'
+import { playListMixin, searchMixin } from '../../common/util/mixin'
 
 import SearchInput from '../../base/search-input/SearchInput'
 import SearchResult from '../../components/search-result/SearchResult'
@@ -56,7 +56,7 @@ import Confirm from '../../base/confirm/Confirm'
 import TopTip from '../../base/top-tip/TopTip'
 
 export default {
-  mixins: [playListMixin, searchMixin, closePlayerByRouter],
+  mixins: [playListMixin, searchMixin],
   components: {
     SearchInput,
     SearchResult,

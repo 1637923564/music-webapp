@@ -10,10 +10,8 @@ import { mapState } from 'vuex'
 import MusicList from '../../components/music-list/MusicList'
 import { getSongList } from '../../api/recommend.js'
 import { createSong, isValidMusic, processUrl } from '../../common/util/song'
-import { closePlayerByRouter } from '../../common/util/mixin'
 
 export default {
-  mixins: [closePlayerByRouter],
   data() {
     return {
       songs: []
@@ -50,14 +48,6 @@ export default {
         }
       })
       return ret
-    }
-  },
-  beforeRouteLeave (to, from, next) {
-    if (this.fullScreen) {
-      this.setFullScreen(false)
-      next(false)
-    } else {
-      next()
     }
   }
 }
