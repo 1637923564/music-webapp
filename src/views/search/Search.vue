@@ -65,12 +65,20 @@ export default {
     Confirm,
     TopTip
   },
+  data() {
+    return {
+      query: ''
+    }
+  },
   computed: {
     tag() {
       return this.hotKey.concat(this.searchHistory)
     }
   },
   methods: {
+    getQuery(query) {
+      this.query = query
+    },
     searchInputBlur() {
       this.$refs.input.blur()
     },
@@ -104,6 +112,14 @@ export default {
   },
   created() {
     this._getHotKey()
+  },
+  beforeRouteLeave (to, from, next) {
+    if (this.query) {
+      this.$refs.input.clearVal()
+      next(false)
+    } else {
+      next()
+    }
   }
 }
 </script>
