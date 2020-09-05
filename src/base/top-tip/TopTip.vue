@@ -61,8 +61,9 @@ export default {
   border-radius 3px
   padding 7px 0
   width 210px
-  color rgb(152,195,121)
+  color #22d59c
   font-weight bold
+  opacity .8
   box-shadow 1px 1px 3px #aaa
   flex-center()
   .icon {

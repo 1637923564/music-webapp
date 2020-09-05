@@ -81,7 +81,7 @@ export default {
     TopTip
   },
   computed: {
-    ...mapState(['playHistory'])
+    ...mapState(['playHistory', 'showPlaylist'])
   },
   methods: {
     selectResult(item) {
@@ -108,6 +108,11 @@ export default {
     currentSelect() {
       this.$refs.scrollSearch.refresh()
       this.$refs.scrollPlay.refresh()
+    },
+    showPlaylist(now) {
+      if (!now) {
+        this.showFlag = false
+      }
     }
   }
 }

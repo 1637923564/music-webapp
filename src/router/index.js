@@ -67,8 +67,9 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (store.state.fullScreen) {
+  if (store.state.fullScreen || store.state.showPlaylist) {
     store.commit('setFullScreen', false)
+    store.commit('setShowPlaylist', false)
     next(false)
   } else {
     next()

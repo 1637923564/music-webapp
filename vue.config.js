@@ -164,7 +164,7 @@ module.exports = {
         'vue-router': 'VueRouter',
         vuex: 'Vuex',
         'vue-lazyload': 'VueLazyload',
-        'better-scroll': 'BScroll',
+        // 'better-scroll': 'BScroll',
         axios: 'axios'
       })
     })
