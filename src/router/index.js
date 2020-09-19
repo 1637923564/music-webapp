@@ -1,18 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store'
-// import Rank from '../views/rank/Rank'
-// import Recommend from '../views/recommend/Recommend'
-// import Search from '../views/search/Search'
-// import Singer from '../views/singer/Singer'
-// import SingerDetail from '../views/singer-detail/SingerDetail'
-// import DiscDetail from '../views/disc-detail/DiskDetail'
-// import RankDetail from '../views/rank-detail/RankDetail'
-// import MyCenter from '../views/my-center/MyCenter'
 
 Vue.use(VueRouter)
 
-// // 懒加载
 const Recommend = () => import('../views/recommend/Recommend')
 const Rank = () => import('../views/rank/Rank')
 const Search = () => import('../views/search/Search')

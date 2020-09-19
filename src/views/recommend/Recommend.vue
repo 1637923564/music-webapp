@@ -63,7 +63,7 @@ export default {
     Scroll,
     Loading
   },
-  created() {
+  mounted() {
     this._getTopBanner()
     this._getRecommendList()
   },

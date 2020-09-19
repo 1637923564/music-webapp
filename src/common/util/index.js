@@ -176,7 +176,6 @@ export default class Util {
       }, interval)
     }
   }
-  // TODO:util.js
 }
 
 const elementStyle = document.createElement('div').style

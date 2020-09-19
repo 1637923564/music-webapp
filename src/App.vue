@@ -24,6 +24,13 @@ export default {
     Tab,
     Player,
     Playlist
+  },
+  mounted() {
+    window.onresize = () => {
+      setTimeout(() => {
+        window.location.reload()
+      }, 100)
+    }
   }
 }
 </script>

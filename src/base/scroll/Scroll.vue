@@ -49,12 +49,14 @@ export default {
       })
 
       if (this.listenScroll) {
+        // 监听滚动
         this.scroll.on('scroll', coor => {
           this.$emit('scroll', coor)
         })
       }
 
       if (this.listenScrollEnd) {
+        // 每次滚动结束
         this.scroll.on('scrollEnd', () => {
           if (this.scroll.y <= this.scroll.maxScrollY + 50) {
             this.$emit('onScrollToEnd')

@@ -4,10 +4,12 @@
       <slot></slot>
     </div>
     <div class="dots-wrapper" v-if="dots.length">
-      <span class="dot"
-            v-for="(item, index) in dots"
-            :key="index"
-            :class="index === currentIndex ? 'active' : ''"></span>
+      <span
+        class="dot"
+        v-for="(item, index) in dots"
+        :key="index"
+        :class="index === currentIndex ? 'active' : ''"
+      ></span>
     </div>
   </div>
 </template>
@@ -35,7 +37,7 @@ export default {
     },
     interval: { // 轮播间隔
       type: Number,
-      default: 5000
+      default: 3000
     }
   },
   mounted() {
@@ -71,8 +73,10 @@ export default {
         sliderGroupWidth += sliderWidth
       }
       // BScroll内部实现循环轮播时，会克隆两个slider-item
-      // 更改窗口大小时，初始化轮播图已经被初始化，也就是slider-item已经被克隆
-      if (this.loop && !isOnResize) { sliderGroupWidth += 2 * sliderWidth }
+      // 更改窗口大小时（isOnResize 为 true），轮播图已经被初始化，也就是slider-item已经被克隆，因而不能重复克隆
+      if (this.loop && !isOnResize) {
+        sliderGroupWidth += 2 * sliderWidth
+      }
       elSliderGroup.style.width = sliderGroupWidth + 'px'
     },
     // 初始化轮播图
@@ -109,7 +113,7 @@ export default {
       let nextIndex
       this.timer = setInterval(() => {
         nextIndex = this.currentIndex + 1
-        // nextIndex = nextIndex === 7 ? 0 : nextIndex
+        nextIndex = nextIndex === 7 ? 0 : nextIndex
         this.slider.goToPage(nextIndex, 0, 400)
       }, this.interval)
     }
