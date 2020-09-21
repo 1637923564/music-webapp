@@ -17,6 +17,7 @@ import MHeader from './components/m-header/MHeader'
 import Tab from './components/tab/Tab'
 import Player from './components/player/Player'
 import Playlist from './components/playlist/Playlist'
+import { mapState } from 'vuex'
 
 export default {
   components: {
@@ -25,8 +26,14 @@ export default {
     Player,
     Playlist
   },
+  computed: {
+    ...mapState(['showPlaylist'])
+  },
   mounted() {
     window.onresize = () => {
+      if (this.$route.path === '/search' || this.showPlaylist) {
+        return
+      }
       setTimeout(() => {
         window.location.reload()
       }, 100)
